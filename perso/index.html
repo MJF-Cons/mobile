@@ -94,6 +94,9 @@ const safeUrl=u=>/^https?:\/\//i.test(String(u||''))?String(u):'#';
 /* ---- données : éléments {id,r (rubrique),d (contenu),m (modifié, ms),del,dirty} gardés sur le téléphone ---- */
 let S=LS('perso_v1')||{items:{},since:null,cfg:{}},tab='home',sync={k:'n',msg:''},busy=false,syncT=null,wx=LS('perso_wx')||null,showDone=false,toastT=null;
 S.items=S.items||{};S.cfg=S.cfg||{};
+/* base de JF (compte Supabase personnel, projet « Midi-10 », tables perso_*) : adresse et clé publique ; le code d'accès n'est jamais écrit ici */
+const BASE={url:'https://wdixjttublpdtmnywuqp.supabase.co',key:'sb_publishable_RiNmsJfQJvl0GSBvCkQD-Q_tDYsqicR'};
+if(!S.cfg.url&&!S.cfg.off){S.cfg.url=BASE.url;S.cfg.key=BASE.key;}
 if(!S.seeded){S.seeded=true;   // produits demandés par JF le 11/11/2026 (modifiables)
   [{nom:'Affleureuse',cible:50,note:'Défonceuse compacte / affleureuse'},{nom:'TV 75 pouces',cible:1000,note:'QLED, Neo QLED ou Mini-LED'}].forEach(d=>{const id=uid();S.items[id]={id,r:'produit',d,m:Date.now(),dirty:true};});}
 const save=()=>SS('perso_v1',S);
@@ -147,8 +150,8 @@ function settings(){const c=S.cfg;sheet('<h3>Réglages</h3><h2 style="margin:0 0
   +'<div class="f"><label>Code d’accès (8 caractères minimum, choisi à la 1re connexion)</label><input id="cc" type="password" value="'+esc(c.code||'')+'"></div><div class="mut sm" id="cmsg"></div>'
   +'<div class="rowb"><button class="bt" onclick="closeSheet()">Fermer</button><button class="bt p" onclick="link()">Relier</button></div>'
   +'<div style="margin-top:12px;text-align:center"><button class="bt s" onclick="exportAll()">Exporter mes données</button></div>');}
-async function link(){const u=$('cu').value.trim(),k=$('ck').value.trim(),c=$('cc').value,m=$('cmsg');if(!u&&!k&&!c){S.cfg.url=S.cfg.key=S.cfg.code='';save();closeSheet();render();return;}
-  if(!/^https:\/\//.test(u)||!k||c.length<8){m.textContent='Adresse (https://…), clé et code de 8 caractères minimum nécessaires.';return;}m.textContent='Vérification…';const old=Object.assign({},S.cfg);Object.assign(S.cfg,{url:u,key:k,code:c});
+async function link(){const u=$('cu').value.trim(),k=$('ck').value.trim(),c=$('cc').value,m=$('cmsg');if(!u&&!k&&!c){S.cfg.url=S.cfg.key=S.cfg.code='';S.cfg.off=true;save();closeSheet();render();return;}
+  if(!/^https:\/\//.test(u)||!k||c.length<8){m.textContent='Adresse (https://…), clé et code de 8 caractères minimum nécessaires.';return;}m.textContent='Vérification…';const old=Object.assign({},S.cfg);Object.assign(S.cfg,{url:u,key:k,code:c,off:false});
   try{const ok=await rpc('perso_init',{code:c});if(!ok)throw new Error('Code incorrect.');S.since=null;Object.values(S.items).forEach(x=>x.dirty=true);save();closeSheet();await doSync();render();toast(sync.k==='e'?'Synchronisation impossible':'Base reliée');}
   catch(e){S.cfg=old;save();m.textContent='Connexion impossible : '+e.message;}}
 function exportAll(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({exporte:new Date().toISOString(),items:Object.values(S.items).filter(x=>!x.del)},null,1)],{type:'application/json'}));a.download='perso_'+iso()+'.json';a.click();}
@@ -171,6 +174,7 @@ const empty=(ic,t)=>'<div class="card"><div class="empty">'+I[ic]+t+'</div></div
 const WAIT=' sera remplie automatiquement dès que la base sera reliée (Réglages).';
 function render(){const T=iso(),todos=all('todo'),open=todos.filter(x=>!x.d.done).sort(byDue),late=open.filter(x=>x.d.due&&x.d.due<=T);let h='';
   if(tab==='home'){const c=S.cfg.ville;
+    if(!linked()&&S.cfg.url)h+='<div class="card pad"><b>Activer la synchronisation</b><div class="mut" style="margin:4px 0 10px">Choisissez votre code d’accès (8 caractères minimum) : vos tâches seront sauvegardées et la presse, les bons plans, la TV et l’agenda pourront arriver.</div><button class="bt p s" onclick="settings()">Choisir mon code</button></div>';
     h+='<div class="card pad">'+(c&&wx&&wx.cur?'<div class="wx">'+I[WMO(wx.cur.weather_code)[0]]+'<div><div class="tp">'+Math.round(wx.cur.temperature_2m)+'°</div><div class="mut">'+WMO(wx.cur.weather_code)[1]+' · vent '+Math.round(wx.cur.wind_speed_10m)+' km/h</div></div><div style="margin-left:auto;text-align:right" class="mut sm" onclick="settings()">'+esc(c.nom)+'</div></div>'
         +'<div class="wd">'+wx.daily.time.slice(1,5).map((d,i)=>'<div>'+frD(d,{weekday:'short'})+I[WMO(wx.daily.weather_code[i+1])[0]]+'<b>'+Math.round(wx.daily.temperature_2m_max[i+1])+'°</b> <span class="mut">'+Math.round(wx.daily.temperature_2m_min[i+1])+'°</span><div class="mut" style="font-size:11.5px">'+(wx.daily.precipitation_probability_max[i+1]||0)+' % pluie</div></div>').join('')+'</div>'
       :'<div class="wx">'+I.part+'<div><b>Météo</b><div class="mut">'+(c?'Chargement…':'Choisissez votre commune.')+'</div></div>'+(c?'':'<button class="bt s" style="margin-left:auto" onclick="settings()">Choisir</button>')+'</div>')+'</div>';
