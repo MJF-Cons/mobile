@@ -36,7 +36,7 @@ h2 button{border:0;background:none;color:var(--acc);font-weight:600;font-size:14
 .mut{color:var(--mut);font-size:14px}.sm{font-size:13px}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:flex;padding:0 4px env(safe-area-inset-bottom)}
 .tabs button{flex:1;border:0;background:none;padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--mut);position:relative}
-.tabs svg{width:56px;height:30px;padding:4px 16px;border-radius:15px;transition:background .15s}.tabs .on{color:var(--ink);font-weight:650}.tabs .on svg{background:var(--accs);color:var(--acc)}
+.tabs svg{width:52px;height:30px;padding:4px 14px;border-radius:15px;transition:background .15s}.tabs .on{color:var(--ink);font-weight:650}.tabs .on svg{background:var(--accs);color:var(--acc)}
 .tabs b{position:absolute;top:4px;left:calc(50% + 8px);background:var(--red);color:#fff;border-radius:10px;font-size:10px;min-width:17px;height:17px;line-height:17px;padding:0 4px}
 .bt{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 14px;font-weight:600;min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 a.bt{text-decoration:none;color:inherit}
@@ -73,6 +73,15 @@ input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .sw{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px}.sw button{width:40px;height:40px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line);padding:0}.sw button.on{box-shadow:0 0 0 2px var(--ink)}
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:22px;font-size:14px;z-index:30;max-width:90%;text-align:center}
 .tm{width:52px;flex:none;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.seg{display:flex;gap:6px;margin-bottom:12px}.seg button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:9px 6px;font-size:14px;font-weight:600;color:var(--mut);min-height:42px}
+.seg button.on{background:var(--accs);border-color:var(--acc);color:var(--acc)}
+.mi{position:relative}.mi input,.mi textarea{padding-right:52px}
+.mic{position:absolute;right:6px;top:5px;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:var(--accs);color:var(--acc);display:grid;place-items:center}
+.mic svg{width:19px;height:19px}.mic.rec{background:var(--red);color:#fff;animation:ecoute 1.2s ease-in-out infinite}
+@keyframes ecoute{50%{opacity:.55}}
+.dst{font-size:13.5px;color:var(--red);font-weight:600;margin:-4px 0 12px}.dst span{color:var(--mut);font-weight:400;font-style:italic}
+.rx{white-space:pre-line;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rowb2{display:flex;gap:8px;margin-bottom:12px}.rowb2 .bt{flex:1}
 </style>
 </head>
 <body>
@@ -84,6 +93,8 @@ const I={home:'<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M
  news:'<svg viewBox="0 0 24 24"><path d="M4 5h13v14a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v10a2 2 0 0 1-2 2"/><path d="M8 9h5M8 13h5M8 17h5"/></svg>',
  shop:'<svg viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg>',
  tv:'<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="m8 2 4 4 4-4"/></svg>',
+ rec:'<svg viewBox="0 0 24 24"><path d="M4 11h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 11h20"/><path d="M9 3.5c-.8.8-.8 1.7 0 2.5s.8 1.7 0 2.5M14 3.5c-.8.8-.8 1.7 0 2.5s.8 1.7 0 2.5"/></svg>',
+ mic:'<svg viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>',
  gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',check:'<svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>',
  cal:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
@@ -132,13 +143,15 @@ async function rpc(fn,args){const u=S.cfg.url.replace(/\/+$/,'');const r=await f
 function setSync(k,msg){sync={k,msg:msg||''};const e=$('sdot');if(e)e.className=k;}
 function soon(){if(!linked())return;setSync('w');clearTimeout(syncT);syncT=setTimeout(doSync,2000);}
 async function doSync(){if(!linked()||busy)return;if(!navigator.onLine){setSync('e','Hors ligne');return;}busy=true;clearTimeout(syncT);
-  const out=Object.values(S.items).filter(x=>x.dirty&&['todo','produit','reglage'].includes(x.r)),marks=new Map(out.map(x=>[x.id,x.m]));
+  const out=Object.values(S.items).filter(x=>x.dirty&&['todo','produit','reglage','recette'].includes(x.r)),marks=new Map(out.map(x=>[x.id,x.m]));
   try{const R=await rpc('perso_sync',{code:S.cfg.code,envoi:out.map(x=>({id:x.id,r:x.r,d:x.d,m:x.m,del:!!x.del})),depuis:S.since});
-    out.forEach(x=>{if(S.items[x.id]&&S.items[x.id].m===marks.get(x.id))S.items[x.id].dirty=false;});let chg=0;
+    /* recettes : gardées « à envoyer » tant que la base ne les a pas acceptées (base pas encore mise à jour) */
+    const back=new Map((R.items||[]).map(y=>[y.id,y.m])),rs=out.filter(x=>x.r==='recette');if(rs.length)S.recAttente=rs.some(x=>back.get(x.id)!==x.m);
+    out.forEach(x=>{if(S.items[x.id]&&S.items[x.id].m===marks.get(x.id)&&!(x.r==='recette'&&back.get(x.id)!==x.m))S.items[x.id].dirty=false;});let chg=0;
     (R.items||[]).forEach(y=>{const x=S.items[y.id];if(!x||y.m>x.m||(y.m===x.m&&!x.dirty)){if(!x||JSON.stringify(x.d)!==JSON.stringify(y.d)||!!x.del!==!!y.del)chg++;S.items[y.id]={id:y.id,r:y.r,d:y.d,m:y.m,del:y.del};}});
     Object.values(S.items).forEach(x=>{if(x.del&&!x.dirty)delete S.items[x.id];});   // suppressions connues de la base : oubliées
     S.since=R.now;save();setSync('n');const a=document.activeElement;if(chg&&!(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))&&!$('sheet'))render();}
-  catch(e){setSync('e',e.message);}finally{busy=false;if(Object.values(S.items).some(x=>x.dirty)&&sync.k!=='e')soon();}}
+  catch(e){setSync('e',e.message);}finally{busy=false;if(Object.values(S.items).some(x=>x.dirty&&!(S.recAttente&&x.r==='recette'))&&sync.k!=='e')soon();}}
 
 /* ---- météo (open-meteo.com, sans compte) ---- */
 const WMO=c=>c===0?['sun','Ciel dégagé']:c<=2?['part','Éclaircies']:c===3?['cloud','Couvert']:c<=48?['fog','Brouillard']:c<=67?['rain','Pluie']:c<=77?['snow','Neige']:c<=82?['rain','Averses']:c<=86?['snow','Averses de neige']:['storm','Orage'];
@@ -155,7 +168,7 @@ function setCity(lat,lon,nom){S.cfg.ville={lat,lon,nom};save();wx=null;closeShee
 function addTodo(){const i=$('nt'),t=i.value.trim();if(!t)return;put('todo',{t,due:$('nd').value||'',done:''});i.value='';$('nd').value='';render();const n=$('nt');n&&n.focus();}
 function tog(id){const o=S.items[id];if(!o)return;put('todo',{done:o.d.done?'':iso()},id);render();}
 function sheet(html){closeSheet();const s=document.createElement('div');s.className='sheet';s.id='sheet';s.onclick=e=>{if(e.target===s)closeSheet();};s.innerHTML='<div>'+html+'</div>';document.body.appendChild(s);}
-function closeSheet(){const s=$('sheet');if(s)s.remove();}
+function closeSheet(){if(dic)stopDictee();const s=$('sheet');if(s)s.remove();}
 function editTodo(id){const o=S.items[id];if(!o)return;sheet('<h3>Tâche</h3><div class="f"><label>À faire</label><textarea id="et" rows="3">'+esc(o.d.t)+'</textarea></div><div class="f"><label>Échéance (facultative)</label><input type="date" id="ed" value="'+esc(o.d.due||'')+'"></div>'
   +'<div class="rowb"><button class="bt d" onclick="del(\''+id+'\');closeSheet();render()">Supprimer</button><button class="bt p" onclick="put(\'todo\',{t:$(\'et\').value.trim()||\'(sans titre)\',due:$(\'ed\').value},\''+id+'\');closeSheet();render()">Enregistrer</button></div>');}
 function editProd(id){const o=id?S.items[id]:null,d=o?o.d:{};sheet('<h3>'+(o?'Produit surveillé':'Nouveau produit à surveiller')+'</h3><div class="f"><label>Produit recherché</label><input id="pn" value="'+esc(d.nom||'')+'" placeholder="ex. Perceuse à colonne"></div>'
@@ -177,6 +190,54 @@ async function link(){const u=$('cu').value.trim(),k=$('ck').value.trim(),c=$('c
   catch(e){S.cfg=old;save();m.textContent='Connexion impossible : '+e.message;}}
 function exportAll(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({exporte:new Date().toISOString(),items:Object.values(S.items).filter(x=>!x.del)},null,1)],{type:'application/json'}));a.download='perso_'+iso()+'.json';a.click();}
 function go(t){tab=t;render();window.scrollTo(0,0);}
+
+/* ---- recettes : idées à essayer et recettes faites ; saisie au clavier ou à la voix (dictée de Chrome, en français) ---- */
+let recF='tout',recQ='',dic=null;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function addText(el,t){t=(' '+t+' ').replace(/\s+(?:retour à la ligne|nouvelle ligne|à la ligne)(?=\s)\s*/gi,'\n').replace(/^ +| +$/g,'').replace(/\n(\S)/g,(m,c)=>'\n'+c.toUpperCase());if(!t.trim())return;
+  const v=el.value,deb=!v.trim()||/[.!?\n]\s*$/.test(v);if(deb)t=t.charAt(0).toUpperCase()+t.slice(1);
+  el.value=v+(v&&!/\s$/.test(v)&&t[0]!=='\n'?' ':'')+t;grow(el);}
+function grow(el){if(el.tagName==='TEXTAREA')el.rows=Math.min(18,Math.max(7,el.value.split('\n').length+1));}
+/* dictée : fid = champ à remplir ; ensuite = champ qui prend la suite après la première phrase (nom puis recette) */
+function dictee(fid,ensuite){if(dic){const meme=dic.fid===fid;stopDictee();if(meme)return;}
+  if(!SR){toast('Dictée indisponible ici : utilisez le micro du clavier du téléphone.');return;}
+  if(!$(fid))return;const d={fid,ensuite,on:true,rec:new SR(),n:0,der:'',muet:0};dic=d;const r=d.rec;
+  r.lang='fr-FR';r.interimResults=true;r.continuous=true;
+  r.onresult=e=>{let tmp='';for(let i=0;i<e.results.length;i++){const x=e.results[i],t=x[0].transcript;
+      if(!x.isFinal){if(i>=d.n)tmp+=t;continue;}if(i<d.n)continue;d.n=i+1;
+      let txt=t;if(d.der&&norm(t).startsWith(norm(d.der)))txt=t.slice(d.der.length);d.der=t;   // certains téléphones répètent la phrase précédente
+      const el=$(d.fid);if(el)addText(el,txt);d.muet=0;if(d.ensuite&&txt.trim()){d.fid=d.ensuite;d.ensuite=null;micUI();}}
+    const p=$('dprev');if(p)p.textContent=tmp;};
+  r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){toast('Micro refusé : autorisez-le pour cette page (cadenas à gauche de l’adresse › Autorisations).');stopDictee();}
+    else if(e.error==='network'){toast('La dictée a besoin du réseau.');stopDictee();}else if(e.error==='no-speech')d.muet++;};
+  r.onend=()=>{if(dic!==d)return;if(d.on&&d.muet<2&&$(d.fid)){d.n=0;d.der='';try{r.start();return;}catch(x){}}stopDictee();};   // relance après un silence, arrêt après deux silences
+  try{r.start();}catch(x){dic=null;toast('Dictée impossible');return;}micUI();}
+function stopDictee(){const d=dic;dic=null;if(d){d.on=false;try{d.rec.stop();}catch(x){}}micUI();}
+function micUI(){document.querySelectorAll('[data-mic]').forEach(b=>b.classList.toggle('rec',!!dic&&dic.fid===b.dataset.mic));const s=$('dst');
+  if(s)s.style.display=dic?'':'none';const p=$('dprev');if(p&&!dic)p.textContent='';
+  const h=$('dhint');if(h&&dic)h.textContent=dic.fid==='rt'?'dites le nom de la recette':'dites les ingrédients et la préparation (« à la ligne » pour aller à la ligne)';}
+const micBt=f=>'<button type="button" class="mic" data-mic="'+f+'" onclick="dictee(\''+f+'\')" aria-label="Dicter">'+I.mic+'</button>';
+function setSorte(s){document.querySelectorAll('#rsorte button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));}
+function editRec(id,voix){const o=id?S.items[id]:null,d=o?o.d:{},s=d.sorte||(voix?'faite':'idee');
+  sheet('<h3>'+(o?esc(d.titre||'Recette'):'Nouvelle recette')+'</h3>'
+  +'<div class="seg" id="rsorte">'+[['idee','Idée à essayer'],['faite','Recette que je fais']].map(([k,l])=>'<button type="button" data-s="'+k+'" class="'+(s===k?'on':'')+'" onclick="setSorte(\''+k+'\')">'+l+'</button>').join('')+'</div>'
+  +'<div class="f"><label>Nom de la recette</label><div class="mi"><input id="rt" value="'+esc(d.titre||'')+'" placeholder="ex. Tarte flambée"></div></div>'
+  +'<div class="f"><label>Ingrédients et préparation</label><div class="mi"><textarea id="rx" rows="7" oninput="grow(this)" placeholder="Ingrédients, étapes, cuisson, astuces…">'+esc(d.texte||'')+'</textarea>'+micBt('rx')+'</div></div>'
+  +'<div class="dst" id="dst" style="display:none">● J’écoute : <b id="dhint" style="font-weight:600"></b> <span id="dprev"></span></div>'
+  +'<div class="f"><label>Lien (facultatif : page web, vidéo)</label><input id="rl" type="url" value="'+esc(d.lien||'')+'" placeholder="https://…" autocapitalize="off"></div>'
+  +(o&&safeUrl(d.lien)!=='#'?'<a class="bt s w" style="margin-bottom:12px" href="'+esc(safeUrl(d.lien))+'" target="_blank" rel="noopener">Ouvrir le lien</a>':'')
+  +'<div class="rowb">'+(o?'<button class="bt d" onclick="if(confirm(\'Supprimer cette recette ?\')){del(\''+id+'\');closeSheet();render()}">Supprimer</button>':'<button class="bt" onclick="closeSheet()">Annuler</button>')
+  +'<button class="bt p" onclick="saveRec(\''+(id||'')+'\')">Enregistrer</button></div>');
+  const t=$('rt');t.insertAdjacentHTML('afterend',micBt('rt'));grow($('rx'));
+  if(voix)dictee('rt','rx');}
+function saveRec(id){let titre=$('rt').value.trim();const texte=$('rx').value.trim(),lien=$('rl').value.trim(),b=document.querySelector('#rsorte .on');
+  if(!titre&&texte)titre=texte.split(/[\n.!?]/)[0].trim().slice(0,60);if(!titre){toast('Indique le nom de la recette');return;}
+  put('recette',{titre,texte,lien,sorte:b?b.dataset.s:'idee'},id||undefined);closeSheet();render();toast('Recette enregistrée');}
+function recRow(o){const d=o.d;return '<div class="it" onclick="editRec(\''+o.id+'\')"><div class="g"><div style="display:flex;gap:8px;align-items:baseline"><b style="font-size:16.5px;flex:1">'+esc(d.titre)+'</b>'+(d.sorte==='faite'?'':'<span class="chip a">idée</span>')+'</div>'
+  +(d.texte?'<div class="mut rx">'+esc(d.texte)+'</div>':'')+'</div></div>';}
+function recList(){const q=norm(recQ),L=all('recette').filter(x=>(recF==='tout'||(x.d.sorte||'idee')===recF)&&(!q||norm(x.d.titre+' '+x.d.texte).includes(q))).sort((a,b)=>String(a.d.titre).localeCompare(String(b.d.titre),'fr'));
+  return L.length?'<div class="card">'+L.map(recRow).join('')+'</div>':empty('rec',q?'Aucune recette ne correspond.':recF==='idee'?'Aucune idée notée.':recF==='faite'?'Aucune recette faite notée.':'Aucune recette pour l’instant.<div class="sm" style="margin-top:8px">Touchez « Enregistrer vocalement » et dites le nom puis la recette.</div>');}
 
 /* ---- écrans ---- */
 function todoRow(o,T){const d=o.d,l=!d.done&&d.due&&d.due<T,j=!d.done&&d.due===T;
@@ -218,9 +279,15 @@ function render(){const T=iso(),todos=all('todo'),open=todos.filter(x=>!x.d.done
       +'<button class="bt w" onclick="editProd()">'+I.plus.replace('<svg','<svg width="20" height="20"')+' Surveiller un autre produit</button>'
       +(all('offre').length?'':'<div class="mut sm" style="text-align:center;margin-top:12px">Les bons plans, nouveautés et baisses de prix trouvés par l’agent s’afficheront sous chaque produit'+(linked()?'.':' une fois la base reliée.')+'</div>');}
   if(tab==='tv'){const L=all('tv').filter(x=>!x.d.date||x.d.date>=T).sort((a,b)=>(a.d.heure||'').localeCompare(b.d.heure||''));h+=L.length?groupDays(L,tvRow,false):empty('tv','La sélection TV de la semaine'+WAIT+'<div class="sm" style="margin-top:8px">Canal+ et son bouquet (HBO, Apple TV+, OCS…), Netflix, Prime Video.</div>');}
-  const nb=late.length,T2={home:['Aujourd’hui',frD(T)],todo:['À faire',open.length+' en cours'],news:['Revue de presse',''],shop:['Veille achats',all('produit').length+' produits surveillés'],tv:['Programmes TV','']}[tab];
+  if(tab==='rec'){const n=all('recette').length;
+    h+='<div class="rowb2" style="margin-top:12px"><button class="bt p" onclick="editRec(null,true)">'+I.mic.replace('<svg','<svg width="20" height="20"')+' Enregistrer vocalement</button><button class="bt" style="flex:none;width:52px;padding:0" onclick="editRec()" aria-label="Écrire une recette">'+I.plus.replace('<svg','<svg width="20" height="20"')+'</button></div>';
+    if(n)h+='<div class="seg">'+[['tout','Toutes'],['idee','Idées'],['faite','Mes recettes']].map(([k,l])=>'<button class="'+(recF===k?'on':'')+'" onclick="recF=\''+k+'\';render()">'+l+'</button>').join('')+'</div>'
+      +(n>6?'<div class="f"><input id="rq" type="search" placeholder="Chercher (nom, ingrédient…)" value="'+esc(recQ)+'" oninput="recQ=this.value;$(\'rl2\').innerHTML=recList()"></div>':'');
+    h+='<div id="rl2">'+recList()+'</div>';
+    if(S.recAttente&&linked())h+='<div class="mut sm" style="text-align:center;margin-top:12px">Recettes gardées sur ce téléphone : la base doit encore être mise à jour pour les sauvegarder.</div>';}
+  const nb=late.length,nr=all('recette').length,T2={home:['Aujourd’hui',frD(T)],todo:['À faire',open.length+' en cours'],news:['Revue de presse',''],shop:['Veille achats',all('produit').length+' produits surveillés'],tv:['Programmes TV',''],rec:['Recettes',nr?nr+' recette'+(nr>1?'s':''):'']}[tab];
   $('app').innerHTML='<div class="top"><h1>'+T2[0]+(T2[1]?'<small>'+T2[1]+'</small>':'')+'</h1><button class="ib" onclick="'+(linked()?'doSync();':'')+'settings()" aria-label="Réglages">'+I.gear+'<i id="sdot" class="'+(linked()?sync.k:'n')+'"></i></button></div><main>'+h+'</main>'
-    +'<nav class="tabs">'+[['home','Accueil'],['todo','À faire'],['news','Presse'],['shop','Achats'],['tv','TV']].map(([k,l])=>'<button class="'+(tab===k?'on':'')+'" onclick="go(\''+k+'\')">'+I[k]+l+(k==='todo'&&nb?'<b>'+nb+'</b>':'')+'</button>').join('')+'</nav>';}
+    +'<nav class="tabs">'+[['home','Accueil'],['todo','À faire'],['news','Presse'],['shop','Achats'],['rec','Recettes'],['tv','TV']].map(([k,l])=>'<button class="'+(tab===k?'on':'')+'" onclick="go(\''+k+'\')">'+I[k]+l+(k==='todo'&&nb?'<b>'+nb+'</b>':'')+'</button>').join('')+'</nav>';}
 
 window.addEventListener('online',()=>{doSync();loadWx();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){doSync();loadWx();if(!$('sheet'))render();}});
