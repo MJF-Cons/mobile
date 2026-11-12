@@ -59,16 +59,24 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--gd);
 .xx input,.f input,.f select,.f textarea{width:100%;border:1px solid #cbd5e1;border-radius:11px;padding:11px 12px;background:#fff;min-height:46px}
 .cam{border:1px solid #cbd5e1;background:#fff;border-radius:11px;width:48px;height:46px;display:grid;place-items:center;flex:none;color:var(--g)}
 .cam svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.phs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.phs img{width:64px;height:64px;object-fit:cover;border-radius:9px;background:var(--line)}
+.phs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.gb svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.phs img{width:64px;height:64px;object-fit:cover;border-radius:9px;background:var(--line);font-size:0;color:transparent}
 .part{background:#f8fafc;padding:8px 14px;font-size:13px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line)}
 .f{margin-bottom:10px}.f label{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}
 .mut{color:var(--mut);font-size:13.5px}.err{color:#b91c1c;font-size:14px;margin-top:8px}
 .late{color:var(--red);font-weight:600}
 .foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:4}
 .foot .bt{flex:1}
-.ov{position:fixed;inset:0;background:rgba(2,6,23,.92);z-index:20;display:flex;flex-direction:column}
-.ov img{flex:1;min-height:0;object-fit:contain;width:100%}.ov div{display:flex;gap:8px;padding:12px calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))}
-.ov .bt{flex:1}
+.ov{position:fixed;inset:0;background:#020617;z-index:20;display:flex;flex-direction:column;color:#fff}
+.ovt{display:flex;align-items:center;gap:10px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top))}.ovt b{display:block;font-size:15px}.ovt span{font-size:12px;opacity:.75}
+.ovi{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}.ovi img{max-width:100%;max-height:100%;object-fit:contain}
+.ov.z .ovi{overflow:auto;display:block}.ov.z .ovi img{max-width:none;max-height:none}
+.ovc{padding:8px 12px 0}.ovc input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:11px;padding:11px 12px;min-height:46px}
+.ovc input::placeholder{color:rgba(255,255,255,.55)}
+.ovb{display:flex;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom))}.ovb .bt{flex:1;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:20px}.ovb .bt:nth-child(2):not(:last-child),.ovb .bt:only-child{font-size:15px}
+.pt{border-left:4px solid transparent}.pt.sok{border-left-color:#16a34a}.pt.srm{border-left-color:var(--amb)}.pt.srep{border-left-color:var(--red);background:#fef2f2}.pt.sso{border-left-color:#94a3b8}
+.gh{display:flex;align-items:center;gap:8px}.gb{display:flex;gap:8px;margin-top:10px}.gb .bt{flex:1;color:var(--g)}
+.nx{margin:4px 0 10px}.nx svg{width:20px;height:20px}
+.toast{display:flex;align-items:center;gap:12px}.toast button{background:none;border:0;color:#86efac;font-weight:700;padding:4px 2px;font-size:14px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:22px;font-size:14px;z-index:30;max-width:90%;text-align:center}
 .logo{font-weight:800;letter-spacing:.06em;color:var(--gd);font-size:20px}
 </style>
@@ -79,9 +87,11 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--gd);
 'use strict';
 const SUPA='https://jkhgysuacydpezqiujmo.supabase.co',KEY='sb_publishable_sQYj0CP428fNgV2XZHoCSQ_YJdPxLSP';
 const ET=[['ok','OK'],['rm','Remarque'],['rep','À reprendre'],['so','Sans objet']];
+const G='_g';   // pseudo-point : photos générales de la visite (v.pts._g = {ph,cap,m})
 const ETL={ok:'OK',rm:'OK avec remarque',rep:'À reprendre',so:'Sans objet'};
 const IC={back:'<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>',
   cam:'<svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+  gal:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>',
   out:'<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>',
   chev:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>'};
 const $=id=>document.getElementById(id);
@@ -94,7 +104,9 @@ const addDays=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);r
 const fr=s=>s?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):'';
 let code=localStorage.getItem('mjf_ctrl_code')||'',list=LS('mjf_ctrl_list')||[],C=null,nav={s:'list'},st={k:'ok',msg:''},busy=false,syncT=null,curV=null,toastT=null;
 
-function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';document.body.appendChild(e);}e.textContent=t;e.style.display='';clearTimeout(toastT);toastT=setTimeout(()=>e.style.display='none',3200);}
+function toast(t,act,ms){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';document.body.appendChild(e);}e.textContent=t;
+  if(act){const b=document.createElement('button');b.textContent=act.label;b.onclick=()=>{e.style.display='none';act.fn();};e.appendChild(b);}
+  e.style.display='';clearTimeout(toastT);toastT=setTimeout(()=>e.style.display='none',ms||3200);}
 async function rpc(fn,args){const r=await fetch(SUPA+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code},args||{}))});
   let d=null;try{d=await r.json();}catch(e){}
   if(!r.ok){const e=new Error((d&&d.message)||('Erreur '+r.status));e.auth=!!(d&&d.code==='28000');throw e;}return d;}
@@ -107,9 +119,23 @@ function phGet(id){if(mem[id])return Promise.resolve(mem[id]);return new Promise
 function phDrop(id){delete mem[id];try{idb&&idb.transaction('ph','readwrite').objectStore('ph').delete(id);}catch(e){}}
 async function phAny(id){let u=await phGet(id);if(!u&&navigator.onLine){try{u=await rpc('mjf_ctrl_photo_get',{pid:id});if(u)await phPut(id,u);}catch(e){}}return u||'';}
 async function phFill(){for(const el of [...document.querySelectorAll('img[data-ph]:not([src])')]){const u=await phAny(el.dataset.ph);if(u)el.src=u;}}
-function shrink(file){return new Promise((ok,ko)=>{const r=new FileReader();r.onerror=()=>ko(r.error);r.onload=()=>{const i=new Image();i.onerror=()=>ko(new Error('image'));
-  i.onload=()=>{const k=Math.min(1,1280/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*k);c.height=Math.round(i.naturalHeight*k);
-    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(i,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.7));};i.src=r.result;};r.readAsDataURL(file);});}
+function exifDate(buf){try{const d=new DataView(buf);if(d.getUint16(0)!==0xFFD8)return 0;let o=2;
+  while(o+10<d.byteLength){const mk=d.getUint16(o),len=d.getUint16(o+2);if((mk&0xFF00)!==0xFF00)return 0;
+    if(mk===0xFFE1&&d.getUint32(o+4)===0x45786966){const t=o+10,le=d.getUint16(t)===0x4949,g16=x=>d.getUint16(x,le),g32=x=>d.getUint32(x,le);
+      const tag=(off,tg)=>{const n=g16(t+off);for(let i=0;i<n;i++){const e=t+off+2+i*12;if(g16(e)===tg)return g32(e+8);}return 0;};
+      const i0=g32(t+4),ex=tag(i0,0x8769);let s=(ex&&tag(ex,0x9003))||tag(i0,0x0132);if(!s)return 0;
+      let str='';for(let i=0;i<19;i++)str+=String.fromCharCode(d.getUint8(t+s+i));
+      const m=str.match(/^(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d)/);return m?new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5]).getTime():0;}
+    o+=2+len;}}catch(e){}return 0;}
+function stamp(g,w,h,at,lbl){const d=new Date(at),t=d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+(lbl?' · '+lbl:'');
+  const fs=Math.max(13,Math.round(Math.min(w,h)*.03)),pad=Math.round(fs*.45);g.font='600 '+fs+'px system-ui,sans-serif';g.textBaseline='middle';
+  const tw=Math.min(g.measureText(t).width,w-fs*3);g.fillStyle='rgba(0,0,0,.55)';g.fillRect(w-tw-pad*3,h-fs-pad*3,tw+pad*2,fs+pad*2);
+  g.fillStyle='#fff';g.fillText(t,w-tw-pad*2,h-fs/2-pad*2,tw);}
+async function shrink(file,lbl){const at=exifDate(await file.arrayBuffer())||file.lastModified||Date.now(),src=URL.createObjectURL(file);
+  try{const i=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('image'));im.src=src;});
+    const k=Math.min(1,1280/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(i.naturalWidth*k);c.height=Math.round(i.naturalHeight*k);
+    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(i,0,0,c.width,c.height);stamp(g,c.width,c.height,at,lbl);
+    return c.toDataURL('image/jpeg',.7);}finally{URL.revokeObjectURL(src);}}
 
 /* ---- modèle / état (mêmes règles que l'appli) ---- */
 const modele=()=>(C&&C.info&&C.info.modele)||[];
@@ -150,42 +176,79 @@ async function sync(){if(!C||busy)return;if(!navigator.onLine){setSt('off');retu
   finally{busy=false;if(C===me){saveC();const a=document.activeElement;if(!hadM||(before!==JSON.stringify(me.etat)&&!(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))))render();}}}
 async function loadList(){try{const d=await rpc('mjf_ctrl_liste',{});list=Array.isArray(d)?d:[];SS('mjf_ctrl_list',list);setSt('ok');}catch(e){if(e.auth){logout();return;}setSt(navigator.onLine?'err':'off',e.message);}
   if(nav.s==='list')render();}
-function logout(){localStorage.removeItem('mjf_ctrl_code');code='';C=null;nav={s:'login'};render();}
+function logout(){localStorage.removeItem('mjf_ctrl_code');code='';C=null;nav={s:'login'};history.replaceState({s:'list'},'');render();}
 
 /* ---- actions ---- */
 function openCh(cid){const L=LS('mjf_ctrl_c_'+cid),it=list.find(x=>x.chantier_id===cid)||{};
   C=L&&L.cid===cid?L:{cid,info:null,etat:{},sent:{},dirty:false};C.etat=C.etat||{};C.etat.visites=C.etat.visites||[];C.etat.reserves=C.etat.reserves||[];C.sent=C.sent||{};C.nom=it.nom||(C.info&&C.info.nom)||'';
-  const V=vis(),t=V.find(v=>v.date===iso());curV=t?t.id:(V.length?V[V.length-1].id:null);nav={s:'ch'};render();sync();}
+  const V=vis(),t=V.find(v=>v.date===iso());curV=t?t.id:(V.length?V[V.length-1].id:null);nav={s:'ch'};history.pushState({s:'ch'},'');render();window.scrollTo(0,0);sync();}
 function newVisit(){const d=iso(),ex=vis().find(v=>v.date===d);if(ex)curV=ex.id;else{const v={id:uid(),date:d,note:'',pts:{},m:Date.now()};C.etat.visites.push(v);curV=v.id;touch();}render();}
 function setE(pid,e){const v=cur();if(!v)return;const x=v.pts[pid]=v.pts[pid]||{};x.e=x.e===e?'':e;x.m=v.m=Date.now();reserveSync(v,pid);touch();
-  const el=$('p_'+pid);if(el){el.outerHTML=ptHTML(v,ptInfo(pid).x,last());phFill();}}
+  const el=$('p_'+pid);if(el){el.outerHTML=ptHTML(v,ptInfo(pid).x,last());phFill();}
+  if(x.e==='rm'||x.e==='rep'){const i=$('r_'+pid);if(i&&!i.value)i.focus();}}
 function setR(pid,val){const v=cur();if(!v)return;const x=v.pts[pid]=v.pts[pid]||{};x.r=String(val||'').trim();x.m=v.m=Date.now();reserveSync(v,pid);touch();}
 function setNote(val){const v=cur();if(!v)return;v.note=val;v.m=Date.now();touch();}
-function addPh(pid){const v=cur();if(!v)return;const i=document.createElement('input');i.type='file';i.accept='image/*';i.capture='environment';
-  i.onchange=async()=>{const f=i.files&&i.files[0];if(!f)return;try{const u=await shrink(f),id=uid();await phPut(id,u);const x=v.pts[pid]=v.pts[pid]||{};x.ph=(x.ph||[]).concat(id);x.m=v.m=Date.now();touch();
-      const el=$('p_'+pid);if(el){el.outerHTML=ptHTML(v,ptInfo(pid).x,last());phFill();}}catch(e){toast('⚠ Photo illisible');}};
+/* photos : appareil photo (1 photo) ou galerie (plusieurs) ; horodatage incrusté ; G = photos générales de la visite (pseudo-point) */
+function addPh(pid,cam){const v=cur();if(!v)return;const i=document.createElement('input');i.type='file';i.accept='image/*';if(cam)i.capture='environment';else i.multiple=true;
+  i.onchange=async()=>{const fs=[...(i.files||[])];if(!fs.length)return;const x=v.pts[pid]=v.pts[pid]||{};x.ph=x.ph||[];let n=0;if(fs.length>1)toast('Traitement de '+fs.length+' photos…');
+    for(const f of fs){try{const u=await shrink(f,String(C.nom||'').slice(0,40)),id=uid();await phPut(id,u);x.ph.push(id);n++;}catch(e){}}
+    if(!n){toast('⚠ Photo illisible');return;}x.m=v.m=Date.now();touch();
+    const el=pid!==G&&$('p_'+pid);if(el){el.outerHTML=ptHTML(v,ptInfo(pid).x,last());phFill();}else render();if(n>1)toast(n+' photos ajoutées');};
   i.click();}
-async function viewPh(pid,id){const u=await phAny(id);if(!u){toast('Photo pas encore disponible');return;}const o=document.createElement('div');o.className='ov';o.id='ov';
-  o.innerHTML='<img src="'+u+'" alt="photo"><div><button class="bt" onclick="delPh(\''+pid+'\',\''+id+'\')">Supprimer</button><button class="bt p" onclick="$(\'ov\').remove()">Fermer</button></div>';document.body.appendChild(o);}
-function delPh(pid,id){if(!confirm('Supprimer cette photo ?'))return;C.etat.visites.forEach(v=>{const x=v.pts&&v.pts[pid];if(x&&x.ph&&x.ph.includes(id)){x.ph=x.ph.filter(y=>y!==id);x.m=v.m=Date.now();}});
-  phDrop(id);delete C.sent[id];if(navigator.onLine)rpc('mjf_ctrl_photo_del',{pid:id}).catch(()=>{});$('ov')&&$('ov').remove();touch();render();}
-function lotAll(e){const v=cur(),L=modele().find(x=>x.id===nav.lot);if(!v||!L)return;const la=last(),now=Date.now();let n=0;
-  pts(L).forEach(x=>{if(la[x.id])return;const o=v.pts[x.id]=v.pts[x.id]||{};o.e=e;o.m=now;n++;});if(!n){toast('Tous les points ont déjà un état');return;}v.m=now;touch();render();}
+const phList=v=>{const o=[],add=pid=>{const x=v.pts&&v.pts[pid];((x&&x.ph)||[]).forEach(id=>o.push({pid,id}));};add(G);modele().forEach(L=>pts(L).forEach(x=>add(x.id)));return o;};
+const phVisit=id=>vis().find(v=>Object.values(v.pts||{}).some(x=>x&&(x.ph||[]).includes(id)))||null;
+let lb=null;
+function viewPh(pid,id){const v=phVisit(id);if(!v)return;const L=phList(v);lb={vid:v.id,L,i:Math.max(0,L.findIndex(x=>x.id===id)),tok:0};history.pushState({ov:1},'');lbDraw();}
+async function lbDraw(){const b=lb;if(!b)return;const v=vis().find(x=>x.id===b.vid);if(!v||!b.L.length){history.back();return;}b.i=(b.i+b.L.length)%b.L.length;
+  const tok=++b.tok,it=b.L[b.i],x=v.pts[it.pid]||{},cap=(x.cap&&x.cap[it.id])||'',I=it.pid===G?null:ptInfo(it.pid),many=b.L.length>1;
+  let o=$('ov');if(!o){o=document.createElement('div');o.className='ov';o.id='ov';document.body.appendChild(o);
+    let sx=null;o.addEventListener('touchstart',e=>{sx=e.touches.length===1&&!o.classList.contains('z')&&e.target.closest('.ovi')?e.touches[0].clientX:null;},{passive:true});
+    o.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)lbGo(dx<0?1:-1);});}
+  o.classList.remove('z');
+  o.innerHTML='<div class="ovt"><div class="grow"><b>'+esc(I?I.L.t+' › '+I.x.l:'Photos de la visite')+'</b><span>Visite du '+fr(v.date)+' · photo '+(b.i+1)+' / '+b.L.length+(many?' · glisser pour changer':'')+'</span></div><button class="ib" onclick="history.back()" aria-label="Fermer">✕</button></div>'
+    +'<div class="ovi" onclick="lbZoom()"><div class="mut" style="color:#cbd5e1">Chargement…</div></div>'
+    +'<div class="ovc"><input placeholder="Légende de la photo…" value="'+esc(cap)+'" onchange="setCap(\''+v.id+'\',\''+it.pid+'\',\''+it.id+'\',this.value)" enterkeyhint="done"></div>'
+    +'<div class="ovb">'+(many?'<button class="bt" onclick="lbGo(-1)" aria-label="Photo précédente">‹</button>':'')+'<button class="bt" onclick="delPh(\''+it.pid+'\',\''+it.id+'\')">Supprimer</button>'+(many?'<button class="bt" onclick="lbGo(1)" aria-label="Photo suivante">›</button>':'')+'</div>';
+  const u=await phAny(it.id);if(lb!==b||tok!==b.tok)return;const box=o.querySelector('.ovi');box.innerHTML=u?'<img src="'+u+'" alt="photo">':'<div class="mut" style="color:#cbd5e1;text-align:center;padding:30px">Photo pas encore disponible (elle arrivera à la prochaine synchronisation).</div>';}
+function lbGo(d){if(!lb)return;lb.i+=d;lbDraw();}
+function lbZoom(){const o=$('ov'),box=o&&o.querySelector('.ovi'),im=box&&box.querySelector('img');if(!im)return;if(o.classList.toggle('z')){im.style.width=(box.clientWidth*2.5)+'px';box.scrollLeft=(im.offsetWidth-box.clientWidth)/2;box.scrollTop=(im.offsetHeight-box.clientHeight)/2;}else im.style.width='';}
+function setCap(vid,pid,id,val){const v=vis().find(x=>x.id===vid);if(!v)return;const x=v.pts[pid]=v.pts[pid]||{};x.cap=Object.assign({},x.cap);val=String(val||'').trim();if(val)x.cap[id]=val;else delete x.cap[id];x.m=v.m=Date.now();touch();}
+function delPh(pid,id){if(!confirm('Supprimer cette photo ?'))return;C.etat.visites.forEach(v=>{const x=v.pts&&v.pts[pid];if(x&&x.ph&&x.ph.includes(id)){x.ph=x.ph.filter(y=>y!==id);if(x.cap&&x.cap[id]){x.cap=Object.assign({},x.cap);delete x.cap[id];}x.m=v.m=Date.now();}});
+  phDrop(id);delete C.sent[id];if(navigator.onLine)rpc('mjf_ctrl_photo_del',{pid:id}).catch(()=>{});touch();render();
+  if(lb){lb.L=lb.L.filter(x=>x.id!==id);if(lb.L.length)lbDraw();else history.back();}}
+const thumbs=(pid,ph)=>(ph||[]).map(id=>'<img data-ph="'+id+'" alt="photo" onclick="viewPh(\''+pid+'\',\''+id+'\')">').join('');
+/* « le reste OK / sans objet » avec annulation possible pendant 8 s */
+function lotAll(e){const v=cur(),L=modele().find(x=>x.id===nav.lot);if(!v||!L)return;const la=last(),now=Date.now(),undo=[];
+  pts(L).forEach(x=>{if(la[x.id])return;undo.push([x.id,v.pts[x.id]?JSON.parse(JSON.stringify(v.pts[x.id])):null]);const o=v.pts[x.id]=v.pts[x.id]||{};o.e=e;o.m=now;});
+  if(!undo.length){toast('Tous les points ont déjà un état');return;}v.m=now;touch();render();
+  toast(undo.length+' point'+(undo.length>1?'s':'')+' passé'+(undo.length>1?'s':'')+' en « '+(e==='ok'?'OK':'Sans objet')+' »',{label:'Annuler',fn:()=>{const t=Date.now();
+    undo.forEach(([id,o])=>{if(o){o.m=t;v.pts[id]=o;}else{v.pts[id]={e:'',m:t};}});v.m=t;touch();render();toast('Annulé');}},8000);}
 function lever(id,on){const r=C.etat.reserves.find(x=>x.id===id);if(!r)return;r.levee=on?iso():'';r.m=Date.now();touch();render();}
 async function login(){const v=$('code').value.trim(),m=$('lmsg');if(v.length<8){m.textContent='Code trop court.';return;}m.textContent='Vérification…';code=v;
-  try{const d=await rpc('mjf_ctrl_liste',{});list=Array.isArray(d)?d:[];localStorage.setItem('mjf_ctrl_code',code);SS('mjf_ctrl_list',list);nav={s:'list'};render();}
+  try{const d=await rpc('mjf_ctrl_liste',{});list=Array.isArray(d)?d:[];localStorage.setItem('mjf_ctrl_code',code);SS('mjf_ctrl_list',list);nav={s:'list'};history.replaceState({s:'list'},'');render();}
   catch(e){code='';m.textContent=e.auth?'Code incorrect.':'Connexion impossible : '+e.message;}}
-function go(s,x){nav=Object.assign({s},x||{});render();window.scrollTo(0,0);}
-function back(){if(nav.s==='lot'||nav.s==='res')go('ch');else if(nav.s==='ch'){C=null;go('list');loadList();}}
+/* navigation : chaque écran = une entrée d'historique → le bouton Retour d'Android revient à l'écran précédent au lieu de fermer l'appli */
+function go(s,x,how){nav=Object.assign({s},x||{});const st=Object.assign({},nav);if(how==='replace')history.replaceState(st,'');else history.pushState(st,'');render();window.scrollTo(0,0);}
+function applyNav(st){st=st||{s:'list'};if(st.s==='list'||!C){if(C){C=null;loadList();}nav={s:'list'};}else nav=Object.assign({},st);render();window.scrollTo(0,0);}
+window.addEventListener('popstate',e=>{const o=$('ov');if(o){o.remove();lb=null;if(e.state&&e.state.ov)history.back();return;}applyNav(e.state);});
+const hors=id=>!!((C.info&&C.info.lots||[]).find(x=>x.id===id)||{}).hors;
+let showH=false;
+function lotsVis(la){const M=modele();return showH?M:M.filter(L=>!hors(L.id)||count(L,la).done);}
+function nbHors(la){return modele().filter(L=>hors(L.id)&&!count(L,la).done).length;}
 
 /* ---- écrans ---- */
-function hdr(t,sub,canBack){return '<div class="top">'+(canBack?'<button class="ib" onclick="back()" aria-label="Retour">'+IC.back+'</button>':'')+'<h1>'+esc(t)+(sub?'<span class="sub">'+esc(sub)+'</span>':'')+'</h1>'
+function hdr(t,sub,canBack){return '<div class="top">'+(canBack?'<button class="ib" onclick="history.back()" aria-label="Retour">'+IC.back+'</button>':'')+'<h1>'+esc(t)+(sub?'<span class="sub">'+esc(sub)+'</span>':'')+'</h1>'
   +'<button class="sy '+st.k+'" id="sy" onclick="'+(C?'sync()':'loadList()')+';if(st.msg)toast(st.msg)"><i></i><span>'+({ok:'À jour',wait:'À envoyer',sync:'Envoi…',off:'Hors ligne',err:'Erreur'}[st.k])+'</span></button></div>';}
 function ptHTML(v,x,la){const c=(v.pts&&v.pts[x.id])||null,e=(c&&c.e)||'',ls=la[x.id]||null,pv=!e&&ls?ls:null,ph=(c&&c.ph)||[];
-  return '<div class="pt '+(pv?'p'+pv.e:'')+'" id="p_'+x.id+'"><div class="l">'+esc(x.l)+'</div>'+(pv?'<div class="pv">'+esc(ETL[pv.e]||'')+' — visite du '+fr(pv.date)+(pv.r?' : '+esc(pv.r):'')+'</div>':'')
+  return '<div class="pt '+(e?'s'+e+' ':'')+(pv?'p'+pv.e:'')+'" id="p_'+x.id+'"><div class="l">'+esc(x.l)+'</div>'+(pv?'<div class="pv">'+esc(ETL[pv.e]||'')+' — visite du '+fr(pv.date)+(pv.r?' : '+esc(pv.r):'')+'</div>':'')
     +'<div class="es">'+ET.map(([k,l])=>'<button class="e '+k+(e===k?' on':'')+'" onclick="setE(\''+x.id+'\',\''+k+'\')">'+l+'</button>').join('')+'</div>'
-    +'<div class="xx"><input placeholder="Remarque…" value="'+esc((c&&c.r)||'')+'" onchange="setR(\''+x.id+'\',this.value)" enterkeyhint="done"><button class="cam" onclick="addPh(\''+x.id+'\')" aria-label="Prendre une photo">'+IC.cam+'</button></div>'
-    +(ph.length?'<div class="phs">'+ph.map(id=>'<img data-ph="'+id+'" alt="photo" onclick="viewPh(\''+x.id+'\',\''+id+'\')">').join('')+'</div>':'')+'</div>';}
+    +'<div class="xx"><input id="r_'+x.id+'" placeholder="'+(e==='rep'?'Ce qui est à reprendre…':'Remarque…')+'" value="'+esc((c&&c.r)||'')+'" onchange="setR(\''+x.id+'\',this.value)" enterkeyhint="done">'
+    +'<button class="cam" onclick="addPh(\''+x.id+'\',1)" aria-label="Prendre une photo">'+IC.cam+'</button><button class="cam" onclick="addPh(\''+x.id+'\',0)" aria-label="Choisir des photos dans la galerie">'+IC.gal+'</button></div>'
+    +(ph.length?'<div class="phs">'+thumbs(x.id,ph)+'</div>':'')+'</div>';}
+function genCard(v){const ph=(v.pts[G]&&v.pts[G].ph)||[];
+  return '<div class="card pad"><div class="gh"><b>Photos de la visite</b>'+(ph.length?'<span class="tag g">'+ph.length+'</span>':'')+'<span class="mut grow" style="text-align:right">vues d’ensemble</span></div>'
+    +(ph.length?'<div class="phs">'+thumbs(G,ph)+'</div>':'')
+    +'<div class="gb"><button class="bt s" onclick="addPh(G,1)">'+IC.cam+' Photo</button><button class="bt s" onclick="addPh(G,0)">'+IC.gal+' Galerie</button></div></div>';}
 function render(){const A=$('app');
   if(!code||nav.s==='login'){A.innerHTML='<main style="padding-top:60px"><div class="card pad"><div class="logo">MJF CONSTRUCTION</div><p style="font-size:18px;font-weight:650;margin:6px 0 14px">Contrôle chantier</p>'
     +'<div class="f"><label>Code d’accès (celui de la Boîte à idées)</label><input id="code" type="password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login()"></div>'
@@ -195,33 +258,48 @@ function render(){const A=$('app');
       :'<div class="card pad mut">Aucun chantier sur le téléphone.<br>Dans l’appli : Construction › Contrôle chantier › « Envoyer sur le téléphone ».</div>')
       +'<div style="text-align:center;margin-top:18px"><button class="bt s" onclick="if(confirm(\'Oublier le code sur ce téléphone ?\'))logout()">'+IC.out+' Déconnexion</button></div></main>';return;}
   if(!C){nav={s:'list'};return render();}
-  const M=modele(),la=last(),v=cur(),V=vis(),T=iso(),R=res(),RO=R.filter(r=>!r.levee),RL=RO.filter(r=>r.limite&&r.limite<T);
+  const la=last(),M=lotsVis(la),NH=nbHors(la),v=cur(),V=vis(),T=iso(),R=res(),RO=R.filter(r=>!r.levee),RL=RO.filter(r=>r.limite&&r.limite<T);
   if(nav.s==='ch'){const tot={ok:0,rm:0,rep:0,so:0,tot:0,done:0};M.forEach(L=>{const n=count(L,la);Object.keys(tot).forEach(k=>tot[k]+=n[k]);});
     A.innerHTML=hdr(C.nom||'Chantier',(C.info&&[C.info.client,C.info.commune].filter(Boolean).join(' · '))||'',true)+'<main>'
-      +(!M.length?'<div class="card pad mut">Chargement du chantier… (connexion nécessaire la première fois)</div>':
+      +(!modele().length?'<div class="card pad mut">Chargement du chantier… (connexion nécessaire la première fois)</div>':
        '<div class="kp"><div><b>'+tot.done+'</b><span>sur '+tot.tot+'</span></div><div><b>'+(tot.ok+tot.rm)+'</b><span>conformes</span></div><div class="'+(tot.rep?'r':'')+'"><b>'+tot.rep+'</b><span>à reprendre</span></div><div class="'+(RL.length?'r':'')+'"><b>'+RO.length+'</b><span>réserves</span></div></div>'
       +'<div class="card pad">'+(V.length?'<div class="f"><label>Visite</label><select onchange="curV=this.value;render()">'+V.slice().reverse().map(x=>'<option value="'+x.id+'"'+(v&&x.id===v.id?' selected':'')+'>Visite du '+fr(x.date)+(x.date===T?' (aujourd’hui)':'')+'</option>').join('')+'</select></div>':'')
         +(v?'<div class="f" style="margin:0"><label>Note de visite (météo, présents…)</label><input value="'+esc(v.note||'')+'" onchange="setNote(this.value)"></div>':'')
-        +(!v||v.date!==T?'<button class="bt p w" style="margin-top:'+(V.length?10:0)+'px" onclick="newVisit()">Démarrer la visite du '+fr(T)+'</button>':'')+'</div>'
+        +(!v||v.date!==T?'<button class="bt p w" style="margin-top:'+(V.length?10:0)+'px" onclick="newVisit()">Démarrer la visite du '+fr(T)+'</button>':'')
+        +(v?'<button class="bt w" style="margin-top:10px" onclick="go(\'fin\')">Terminer la visite</button>':'')+'</div>'
+      +(v?genCard(v):'')
       +(RO.length?'<div class="card"><button class="row" onclick="go(\'res\')"><span class="dot rep"></span><span class="grow"><b>Réserves à lever</b><span class="m">'+RO.length+' ouverte'+(RO.length>1?'s':'')+(RL.length?' · <span class="late">'+RL.length+' en retard</span>':'')+'</span></span><span class="chev">'+IC.chev+'</span></button></div>':'')
       +'<h2>Lots</h2><div class="card">'+M.map(L=>{const n=count(L,la),ent=((C.info.lots||[]).find(x=>x.id===L.id)||{}).ent||'';
-        return '<button class="row" onclick="'+(v?'go(\'lot\',{lot:\''+L.id+'\'})':'toast(\'Démarre d’abord la visite du jour\')')+'"><span class="dot '+dot(n)+'"></span><span class="grow"><b>'+L.id+'. '+esc(L.t)+'</b>'+(ent?'<span class="m">'+esc(ent)+'</span>':'')
-          +'<div class="bar"><i style="width:'+(n.tot?n.done/n.tot*100:0)+'%"></i></div></span>'+(n.rep?'<span class="tag">'+n.rep+'</span>':'')+'<span class="n">'+n.done+'/'+n.tot+'</span><span class="chev">'+IC.chev+'</span></button>';}).join('')+'</div>')
-      +'</main>';return;}
-  if(nav.s==='lot'){const L=M.find(x=>x.id===nav.lot);if(!L||!v){nav={s:'ch'};return render();}const n=count(L,la);
+        return '<button class="row" onclick="'+(v?'go(\'lot\',{lot:\''+L.id+'\'})':'toast(\'Démarre d’abord la visite du jour\')')+'"><span class="dot '+dot(n)+'"></span><span class="grow"><b>'+L.id+'. '+esc(L.t)+'</b>'+(ent?'<span class="m">'+esc(ent)+'</span>':'')+(hors(L.id)?'<span class="m">non chiffré</span>':'')
+          +'<div class="bar"><i style="width:'+(n.tot?n.done/n.tot*100:0)+'%"></i></div></span>'+(n.rep?'<span class="tag">'+n.rep+'</span>':'')+'<span class="n">'+n.done+'/'+n.tot+'</span><span class="chev">'+IC.chev+'</span></button>';}).join('')+'</div>'
+      +(NH?'<div style="text-align:center;margin-top:10px"><button class="bt s" onclick="showH=!showH;render()">'+(showH?'Masquer':'Afficher')+' '+(NH>1?'les '+NH+' lots non chiffrés':'le lot non chiffré')+'</button></div>':''))
+      +'</main>';phFill();return;}
+  if(nav.s==='lot'){const L=modele().find(x=>x.id===nav.lot);if(!L||!v){nav={s:'ch'};return render();}const n=count(L,la),k=M.findIndex(x=>x.id===L.id),nx=k>=0?M[k+1]:null;
     A.innerHTML=hdr(L.id+'. '+L.t,'Visite du '+fr(v.date)+' · '+n.done+'/'+n.tot,true)+'<main><div class="card">'
-      +L.parts.map(P=>(P.t?'<div class="part">'+esc(P.t)+'</div>':'')+P.pts.map(x=>ptHTML(v,x,la)).join('')).join('')+'</div></main>'
+      +L.parts.map(P=>(P.t?'<div class="part">'+esc(P.t)+'</div>':'')+P.pts.map(x=>ptHTML(v,x,la)).join('')).join('')+'</div>'
+      +(nx?'<button class="bt p w nx" onclick="go(\'lot\',{lot:\''+nx.id+'\'},\'replace\')">Lot suivant : '+nx.id+'. '+esc(nx.t)+' '+IC.chev+'</button>':'<button class="bt p w nx" onclick="go(\'fin\',null,\'replace\')">Dernier lot — terminer la visite</button>')+'</main>'
       +'<div class="foot"><button class="bt s" onclick="lotAll(\'ok\')">Le reste : OK</button><button class="bt s" onclick="lotAll(\'so\')">Le reste : sans objet</button></div>';phFill();return;}
-  if(nav.s==='res'){A.innerHTML=hdr('Réserves',C.nom,true)+'<main>'+(R.length?R.map(r=>{const L=M.find(x=>x.id===r.lotId),ent=((C.info.lots||[]).find(x=>x.id===r.lotId)||{}).ent||'',lt=!r.levee&&r.limite&&r.limite<T;
+  if(nav.s==='res'){A.innerHTML=hdr('Réserves',C.nom,true)+'<main>'+(R.length?R.map(r=>{const L=modele().find(x=>x.id===r.lotId),ent=((C.info.lots||[]).find(x=>x.id===r.lotId)||{}).ent||'',lt=!r.levee&&r.limite&&r.limite<T,
+      rv=C.etat.visites.find(x=>x.id===r.vid&&!x.del),ph=(rv&&rv.pts&&rv.pts[r.pid]&&rv.pts[r.pid].ph)||[];
       return '<div class="card pad"><div class="mut">'+esc(L?L.t:'')+(ent?' · '+esc(ent):'')+'</div><div style="font-weight:600;margin:3px 0">'+esc(r.label)+'</div>'+(r.desc?'<div>'+esc(r.desc)+'</div>':'')
+        +(ph.length?'<div class="phs">'+thumbs(r.pid,ph)+'</div>':'')
         +'<div class="mut" style="margin:6px 0 10px">Constatée le '+fr(r.date)+(r.limite?' · <span class="'+(lt?'late':'')+'">à lever avant le '+fr(r.limite)+'</span>':'')+'</div>'
         +(r.levee?'<span class="tag g">Levée le '+fr(r.levee)+'</span> <button class="bt s" style="float:right" onclick="lever(\''+r.id+'\',0)">Rouvrir</button>':'<button class="bt p w" onclick="lever(\''+r.id+'\',1)">Lever la réserve</button>')+'</div>';}).join('')
-      :'<div class="card pad mut">Aucune réserve.</div>')+'</main>';return;}}
+      :'<div class="card pad mut">Aucune réserve.</div>')+'</main>';phFill();return;}
+  if(nav.s==='fin'){if(!v){nav={s:'ch'};return render();}const n={ok:0,rm:0,rep:0,so:0};Object.keys(v.pts||{}).forEach(k=>{const x=v.pts[k];if(x&&n[x.e]!=null)n[x.e]++;});
+    const nb=n.ok+n.rm+n.rep+n.so,NR=R.filter(r=>r.vid===v.id),PH=phList(v).length,lv=R.filter(r=>r.levee===v.date&&r.vid!==v.id);
+    A.innerHTML=hdr('Fin de visite','Visite du '+fr(v.date),true)+'<main>'
+      +'<div class="kp"><div><b>'+nb+'</b><span>points vus</span></div><div><b>'+(n.ok+n.rm)+'</b><span>conformes</span></div><div class="'+(n.rep?'r':'')+'"><b>'+n.rep+'</b><span>à reprendre</span></div><div><b>'+PH+'</b><span>photos</span></div></div>'
+      +'<div class="card pad"><div class="f"><label>Note de visite (météo, présents…)</label><input value="'+esc(v.note||'')+'" onchange="setNote(this.value)"></div>'
+        +'<div class="mut">'+n.ok+' OK · '+n.rm+' avec remarque · '+n.rep+' à reprendre · '+n.so+' sans objet'+(lv.length?' · '+lv.length+' réserve'+(lv.length>1?'s':'')+' levée'+(lv.length>1?'s':''):'')+'</div></div>'
+      +(NR.length?'<h2>Nouvelles réserves ('+NR.length+')</h2><div class="card">'+NR.map(r=>'<div class="pt"><div class="l">'+esc(r.label)+'</div><div class="pv">'+esc(r.desc||'—')+(r.limite?' · à lever avant le '+fr(r.limite):'')+'</div></div>').join('')+'</div>':'')
+      +'<div class="card pad"><div class="mut" style="margin-bottom:10px">'+(st.k==='ok'?'Tout est envoyé : la visite est disponible dans l’appli sur le PC (compte rendu, mail des réserves).':st.k==='off'?'Hors ligne : la visite partira dès que le réseau reviendra (laisser la page ouverte ou la rouvrir).':'Envoi vers l’appli en cours ou en attente.')+'</div>'
+        +'<button class="bt p w" onclick="sync()">Synchroniser maintenant</button><button class="bt w" style="margin-top:8px" onclick="history.go(-2)">Retour à la liste des chantiers</button></div></main>';return;}}
 
 window.addEventListener('online',()=>{if(C&&C.dirty)sync();else if(!C)loadList();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&code){if(C)sync();else loadList();}});
-window.addEventListener('popstate',()=>{});
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('controle-sw.js').catch(()=>{});
+history.replaceState({s:'list'},'');
 idbOpen().then(()=>{render();if(code)loadList();});
 </script>
 </body>
