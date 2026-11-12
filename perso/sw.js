@@ -1,5 +1,5 @@
 /* Appli Perso : garde la page disponible hors ligne. Réseau d'abord, copie locale sinon. Les données (base, météo) ne sont pas mises en cache ici. */
-const CACHE = 'perso-v2';
+const CACHE = 'perso-v3';
 const FILES = ['./', 'index.html', 'perso.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('perso-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
