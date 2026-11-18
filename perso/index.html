@@ -122,8 +122,7 @@ S.items=S.items||{};S.cfg=S.cfg||{};
 /* base de JF (compte Supabase personnel, projet « Midi-10 », tables perso_*) : adresse et clé publique ; le code d'accès n'est jamais écrit ici */
 const BASE={url:'https://wdixjttublpdtmnywuqp.supabase.co',key:'sb_publishable_RiNmsJfQJvl0GSBvCkQD-Q_tDYsqicR'};
 if(!S.cfg.url&&!S.cfg.off){S.cfg.url=BASE.url;S.cfg.key=BASE.key;}
-if(!S.seeded){S.seeded=true;   // produits demandés par JF le 11/11/2026 (modifiables)
-  [{nom:'Affleureuse',cible:50,note:'Défonceuse compacte / affleureuse'},{nom:'TV 75 pouces',cible:1000,note:'QLED, Neo QLED ou Mini-LED'}].forEach(d=>{const id=uid();S.items[id]={id,r:'produit',d,m:Date.now(),dirty:true};});}
+/* (les deux produits de départ étaient recréés sur chaque appareil neuf, d'où des doublons : plus de semis, voir dedupProd) */
 const save=()=>SS('perso_v1',S);
 /* couleur de l'appli, choisie dans Réglages (gardée sur ce téléphone) */
 const COUL={terre:['Terre cuite','#b5532d'],sapin:['Vert sapin','#2e6b4e'],bleu:['Bleu','#2f4f8f'],prune:['Prune','#7a3b69'],graphite:['Graphite','#3f474f']};
@@ -132,6 +131,10 @@ function setColor(k){S.cfg.couleur=k;save();applyColor();document.querySelectorA
 const safeImg=u=>/^https:\/\//i.test(String(u||''))?String(u):'';
 const img=(u,c)=>{u=safeImg(u);return u?'<img class="'+c+'" src="'+esc(u)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'';};
 const all=r=>Object.values(S.items).filter(x=>x.r===r&&!x.del);
+/* produits en double (même nom, même prix maximum, mêmes précisions) : on garde celui qui a des offres, sinon le plus récent */
+function dedupProd(){const g={};let n=0;all('produit').forEach(p=>{const k=[String(p.d.nom||'').trim().toLowerCase(),+p.d.cible||0,String(p.d.note||'').trim()].join('|');(g[k]=g[k]||[]).push(p);});
+  Object.values(g).forEach(L=>{if(L.length<2)return;const nb=p=>all('offre').filter(o=>o.d.produit===p.id).length;L.sort((a,b)=>nb(b)-nb(a)||b.m-a.m);
+    L.slice(1).forEach(p=>{p.del=true;p.m=Date.now();p.dirty=true;n++;});});if(n)save();return n;}
 function put(r,d,id){id=id||uid();const o=S.items[id]||{id,r};o.d=Object.assign({},o.d,d);o.m=Date.now();o.dirty=true;o.del=false;S.items[id]=o;save();soon();return o;}
 function del(id){const o=S.items[id];if(!o)return;o.del=true;o.m=Date.now();o.dirty=true;save();soon();}
 function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';document.body.appendChild(e);}e.textContent=t;e.style.display='';clearTimeout(toastT);toastT=setTimeout(()=>e.style.display='none',3000);}
@@ -149,6 +152,7 @@ async function doSync(){if(!linked()||busy)return;if(!navigator.onLine){setSync(
     const back=new Map((R.items||[]).map(y=>[y.id,y.m])),rs=out.filter(x=>x.r==='recette');if(rs.length)S.recAttente=rs.some(x=>back.get(x.id)!==x.m);
     out.forEach(x=>{if(S.items[x.id]&&S.items[x.id].m===marks.get(x.id)&&!(x.r==='recette'&&back.get(x.id)!==x.m))S.items[x.id].dirty=false;});let chg=0;
     (R.items||[]).forEach(y=>{const x=S.items[y.id];if(!x||y.m>x.m||(y.m===x.m&&!x.dirty)){if(!x||JSON.stringify(x.d)!==JSON.stringify(y.d)||!!x.del!==!!y.del)chg++;S.items[y.id]={id:y.id,r:y.r,d:y.d,m:y.m,del:y.del};}});
+    if(dedupProd())chg++;
     Object.values(S.items).forEach(x=>{if(x.del&&!x.dirty)delete S.items[x.id];});   // suppressions connues de la base : oubliées
     S.since=R.now;save();setSync('n');const a=document.activeElement;if(chg&&!(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName))&&!$('sheet'))render();}
   catch(e){setSync('e',e.message);}finally{busy=false;if(Object.values(S.items).some(x=>x.dirty&&!(S.recAttente&&x.r==='recette'))&&sync.k!=='e')soon();}}
@@ -244,9 +248,10 @@ function todoRow(o,T){const d=o.d,l=!d.done&&d.due&&d.due<T,j=!d.done&&d.due===T
   return '<div class="it'+(d.done?' done':'')+'"><button class="ck'+(d.done?' on':'')+'" onclick="tog(\''+o.id+'\')" aria-label="Fait">'+I.check+'</button><div class="g" onclick="editTodo(\''+o.id+'\')"><div class="t">'+esc(d.t)+'</div>'
     +(d.due&&!d.done?'<div class="due'+(l?' l':j?' j':'')+'">'+(l?'En retard · ':'')+(j?'Aujourd’hui':frD(d.due,{weekday:'short',day:'numeric',month:'short'}))+'</div>':'')+'</div></div>';}
 const byDue=(a,b)=>(a.d.due||'9999').localeCompare(b.d.due||'9999')||a.m-b.m;
-function offers(pid){return all('offre').filter(x=>!pid||x.d.produit===pid).sort((a,b)=>(b.d.date||'').localeCompare(a.d.date||''));}
+function offers(pid,ref){return all('offre').filter(x=>(!pid||x.d.produit===pid)&&(ref||x.d.type!=='repère')).sort((a,b)=>(b.d.date||'').localeCompare(a.d.date||''));}
+/* « repère » = meilleur prix trouvé quand rien n'est sous le prix maximum (déposé par la veille, au plus un par produit) */
 function offerRow(o,p){const d=o.d,ok=p&&p.d.cible&&d.prix&&d.prix<=p.d.cible;
-  return '<a class="art" href="'+esc(safeUrl(d.url))+'" target="_blank" rel="noopener"><div class="g"><div class="h"><span class="chip'+(d.type==='baisse'||d.type==='bon plan'?' a':'')+'">'+esc(d.type||'offre')+'</span><span>'+esc(d.marchand||'')+'</span><span style="margin-left:auto">'+(d.date?frD(d.date,{day:'numeric',month:'short'}):'')+'</span></div>'
+  return '<a class="art" href="'+esc(safeUrl(d.url))+'" target="_blank" rel="noopener"><div class="g"><div class="h"><span class="chip'+(d.type==='baisse'||d.type==='bon plan'?' a':'')+'">'+esc(d.type==='repère'?'meilleur prix actuel':d.type||'offre')+'</span><span>'+esc(d.marchand||'')+'</span><span style="margin-left:auto">'+(d.date?frD(d.date,{day:'numeric',month:'short'}):'')+'</span></div>'
     +'<b>'+esc(d.titre||'')+'</b><div style="display:flex;gap:10px;align-items:baseline"><span class="px'+(ok?' ok':'')+'">'+(d.prix?eur(d.prix):'')+'</span>'+(d.avant?'<span class="mut sm" style="text-decoration:line-through">'+eur(d.avant)+'</span>':'')+(ok?'<span class="chip">sous votre prix</span>':'')+'</div>'+(d.note?'<p>'+esc(d.note)+'</p>':'')+'</div>'+img(d.img,'th')+'</a>';}
 function artRow(o,i){const d=o.d,lead=i===0&&safeImg(d.img),meta='<div class="h"><span class="src">'+esc(d.source||'')+'</span>'+(d.theme?'<span>· '+esc(d.theme)+'</span>':'')+'</div>';
   return '<a class="art'+(lead?' lead':'')+'" href="'+esc(safeUrl(d.url))+'" target="_blank" rel="noopener">'+(lead?img(d.img,'im'):'')+'<div class="g">'+meta+'<b>'+esc(d.titre||'')+'</b>'+(d.resume?'<p>'+esc(d.resume)+'</p>':'')+'</div>'+(lead?'':img(d.img,'th'))+'</a>';}
@@ -275,7 +280,7 @@ function render(){const T=iso(),todos=all('todo'),open=todos.filter(x=>!x.d.done
     if(done.length)h+='<h2><span>Faites ('+done.length+')</span><button onclick="showDone=!showDone;render()">'+(showDone?'Masquer':'Afficher')+'</button></h2>'+(showDone?'<div class="card">'+done.slice(0,40).map(o=>todoRow(o,T)).join('')+'</div>':'');}
   if(tab==='news'){const L=all('presse').sort((a,b)=>(a.d.rang||0)-(b.d.rang||0));h+=L.length?groupDays(L,artRow,true):empty('news','La revue de presse du matin'+WAIT+'<div class="sm" style="margin-top:8px">Sources : DNA, Le Figaro, Le Monde, Le Point, Les Échos, Le Moniteur, Paris Match, presse informatique.</div>');}
   if(tab==='shop'){const P=all('produit').sort((a,b)=>a.m-b.m);
-    h+=P.map(p=>{const of=offers(p.id);return '<div class="card"><div class="it" onclick="editProd(\''+p.id+'\')"><div class="g"><b style="font-size:16.5px">'+esc(p.d.nom)+'</b><div class="due">'+(p.d.cible?'moins de '+eur(p.d.cible):'sans prix maximum')+(p.d.note?' · '+esc(p.d.note):'')+'</div></div><span class="chip'+(of.length?' a':'')+'">'+(of.length?of.length+' offre'+(of.length>1?'s':''):'en veille')+'</span></div>'+of.slice(0,6).map(o=>offerRow(o,p)).join('')+'</div>';}).join('')
+    h+=P.map(p=>{const of=offers(p.id),rf=of.length?[]:offers(p.id,1).slice(0,1);return '<div class="card"><div class="it" onclick="editProd(\''+p.id+'\')"><div class="g"><b style="font-size:16.5px">'+esc(p.d.nom)+'</b><div class="due">'+(p.d.cible?'moins de '+eur(p.d.cible):'sans prix maximum')+(p.d.note?' · '+esc(p.d.note):'')+'</div></div><span class="chip'+(of.length?' a':'')+'">'+(of.length?of.length+' offre'+(of.length>1?'s':''):'en veille')+'</span></div>'+of.slice(0,6).map(o=>offerRow(o,p)).join('')+rf.map(o=>offerRow(o,p)).join('')+'</div>';}).join('')
       +'<button class="bt w" onclick="editProd()">'+I.plus.replace('<svg','<svg width="20" height="20"')+' Surveiller un autre produit</button>'
       +(all('offre').length?'':'<div class="mut sm" style="text-align:center;margin-top:12px">Les bons plans, nouveautés et baisses de prix trouvés par l’agent s’afficheront sous chaque produit'+(linked()?'.':' une fois la base reliée.')+'</div>');}
   if(tab==='tv'){const L=all('tv').filter(x=>!x.d.date||x.d.date>=T).sort((a,b)=>(a.d.heure||'').localeCompare(b.d.heure||''));h+=L.length?groupDays(L,tvRow,false):empty('tv','La sélection TV de la semaine'+WAIT+'<div class="sm" style="margin-top:8px">Canal+ et son bouquet (HBO, Apple TV+, OCS…), Netflix, Prime Video.</div>');}
